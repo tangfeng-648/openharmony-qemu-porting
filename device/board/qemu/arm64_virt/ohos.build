@@ -1,0 +1,11 @@
+{
+    "subsystem": "qemu_products",
+    "parts": {
+        "qemu_products": {
+            "module_list": [
+                "//device/board/qemu/${device_name}:arm64_virt_group"
+            ],
+            "inner_kits": []
+        }
+    }
+}

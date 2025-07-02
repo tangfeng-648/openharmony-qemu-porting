@@ -1,0 +1,114 @@
+# Copyright (C) 2021 HiHope Open Source Organization .
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/ohos/ndk/ndk.gni")
+
+ohos_prebuilt_shared_library("mesa_virgl_gbm") {
+  source = "libgbm.so.1.0.0"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+  symlink_target_name = [
+    "libgbm.so.1",
+    "libgbm.so",
+  ]
+}
+
+ohos_prebuilt_shared_library("mesa_virgl_egl") {
+  source = "libEGL.so.1.0.0"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+  symlink_target_name = [
+    "libEGL.so.1",
+    "libEGL.so",
+    "libGLESv1.so",
+    "libEGL_impl.so",
+  ]
+}
+
+ohos_prebuilt_shared_library("mesa_virgl_glapi") {
+  source = "libglapi.so.0.0.0"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+  symlink_target_name = [
+    "libglapi.so.0",
+    "libglapi.so",
+  ]
+}
+
+ohos_prebuilt_shared_library("mesa_virgl_glesv1") {
+  source = "libGLESv1_CM.so.1.1.0"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+  symlink_target_name = [
+    "libGLESv1_CM.so.1",
+    "libGLESv1_CM.so",
+    "libGLESv1_impl.so",
+  ]
+}
+
+ohos_prebuilt_shared_library("mesa_virgl_glesv2") {
+  source = "libGLESv2.so.2.0.0"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+  symlink_target_name = [
+    "libGLESv2.so.2",
+    "libGLESv2.so",
+    "libGLESv2_impl.so",
+    "libGLESv3_impl.so",
+  ]
+}
+
+ohos_prebuilt_shared_library("libgallium_dri") {
+  source = "libgallium_dri.so"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+}
+
+ohos_prebuilt_shared_library("virtio_gpu_dri") {
+  source = "virtio_gpu_dri.so"
+  install_enable = true
+  install_images = [ chipset_base_dir ]
+#  relative_install_dir = "chipsetsdk"
+  subsystem_name = "qemu_products"
+  part_name = "qemu_products"
+}
+
+group("mesa-gpu-virgl") {
+  public_deps = [
+    ":mesa_virgl_egl",
+    ":mesa_virgl_gbm",
+    ":mesa_virgl_glapi",
+    ":mesa_virgl_glesv1",
+    ":mesa_virgl_glesv2",
+    ":virtio_gpu_dri",
+  ]
+}

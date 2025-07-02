@@ -1,0 +1,16 @@
+{
+  "parts": {
+    "product_arm64_virt": {
+      "module_list": [
+        "//vendor/qemu/arm64_virt/default_app_config:default_app_config",
+        "//vendor/qemu/arm64_virt/image_conf:custom_image_conf",
+        "//vendor/qemu/arm64_virt/preinstall-config:preinstall-config",
+        "//vendor/qemu/arm64_virt/resourceschedule:resourceschedule",
+        "//vendor/qemu/arm64_virt/etc:product_etc_conf",
+        "//vendor/qemu/arm64_virt/hdf_config/uhdf:hdf_config",
+        "//vendor/qemu/arm64_virt/window_config:window_config"
+      ]
+    }
+  },
+  "subsystem": "product_qemu"
+}
