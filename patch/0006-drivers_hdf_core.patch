@@ -1,0 +1,58 @@
+diff --git a/framework/core/adapter/vnode/src/hdf_vnode_adapter.c b/framework/core/adapter/vnode/src/hdf_vnode_adapter.c
+index b4de17d5..233747e1 100644
+--- a/framework/core/adapter/vnode/src/hdf_vnode_adapter.c
++++ b/framework/core/adapter/vnode/src/hdf_vnode_adapter.c
+@@ -291,7 +291,8 @@ static int ReadDeviceEventInRingBuffer(
+         }
+         cursor = client->readCursor;
+         event = client->eventRingBuffer[cursor];
+-    } while (!__sync_bool_compare_and_swap(&(client->readCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX));
++    //} while (!__sync_bool_compare_and_swap(&(client->readCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX));
++    } while (arch_cmpxchg(&(client->readCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX) != cursor);
+ 
+     if (event == NULL) {
+         HDF_LOGE("%{public}s: eventRingBuffer is empty", __func__);
+@@ -300,7 +301,9 @@ static int ReadDeviceEventInRingBuffer(
+ 
+     ret = EventDataProcess(event, bwr, bwrUser);
+     if (ret != HDF_SUCCESS) {
+-        if (!__sync_bool_compare_and_swap(&(client->readCursor), (cursor + 1) % EVENT_RINGBUFFER_MAX, cursor)) {
++        //if (!__sync_bool_compare_and_swap(&(client->readCursor), (cursor + 1) % EVENT_RINGBUFFER_MAX, cursor)) {
++        if (arch_cmpxchg(&(client->readCursor), (cursor + 1) % EVENT_RINGBUFFER_MAX, cursor)
++			    != (cursor + 1) % EVENT_RINGBUFFER_MAX) {
+             HDF_LOGE("%{public}s: EventDataProcess failed and cursor had been changed, drop the event", __func__);
+             DevEventFree(event);
+         }
+@@ -425,7 +428,8 @@ static void DropOldEventInRingBuffer(struct HdfVNodeAdapterClient *vnodeClient)
+             break;
+         }
+         firstEvent = vnodeClient->eventRingBuffer[cursor];
+-    } while (!__sync_bool_compare_and_swap(&(vnodeClient->readCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX));
++    //} while (!__sync_bool_compare_and_swap(&(vnodeClient->readCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX));
++    } while (arch_cmpxchg(&(vnodeClient->readCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX) != cursor);
+ 
+     if (firstEvent != NULL) {
+         if (vnodeClient->adapter != NULL) {
+@@ -445,7 +449,8 @@ static void AddEventToRingBuffer(struct HdfVNodeAdapterClient *vnodeClient, stru
+     }
+     do {
+         cursor = vnodeClient->writeCursor;
+-    } while (!__sync_bool_compare_and_swap(&(vnodeClient->writeCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX));
++    //} while (!__sync_bool_compare_and_swap(&(vnodeClient->writeCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX));
++    } while (arch_cmpxchg(&(vnodeClient->writeCursor), cursor, (cursor + 1) % EVENT_RINGBUFFER_MAX) != cursor);
+ 
+     vnodeClient->eventRingBuffer[cursor] = event;
+     vnodeClient->writeHeadEvent = false;
+diff --git a/framework/model/display/driver/panel/ili9881c_boe.c b/framework/model/display/driver/panel/ili9881c_boe.c
+index 07c6d209..fdb8c770 100644
+--- a/framework/model/display/driver/panel/ili9881c_boe.c
++++ b/framework/model/display/driver/panel/ili9881c_boe.c
+@@ -436,7 +436,7 @@ static struct Ili9881cBoeDev *ToIli9881cBoeDev(const struct PanelData *panel)
+     return (struct Ili9881cBoeDev *)panel->object->priv;
+ }
+ 
+-static SetGpioState(uint16_t gpio, uint16_t dir, uint16_t level, uint32_t delay)
++static int SetGpioState(uint16_t gpio, uint16_t dir, uint16_t level, uint32_t delay)
+ {
+     int32_t ret;
+ 

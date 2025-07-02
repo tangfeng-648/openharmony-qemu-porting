@@ -1,0 +1,137 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index 08bd5c0..52228ba 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -22,9 +22,16 @@ import("//build/ohos/kernel/kernel.gni")
+ # it needs adaptation for more device target
+ kernel_image = ""
+ if (target_cpu == "arm") {
+-  kernel_image = "uImage"
++  if (product_name == "arm64_virt") {
++    kernel_image = "Image"
++  }
++  else {
++    kernel_image = "uImage"
++  }
+ } else if (target_cpu == "arm64") {
+   kernel_image = "Image"
++} else if (target_cpu == "riscv64") {
++  kernel_image = "Image"
+ } else if (target_cpu == "x86_64") {
+   kernel_image = "bzImage"
+ }
+@@ -52,24 +59,47 @@ if (os_level == "mini" || os_level == "small") {
+     ]
+   }
+ 
+-  action("build_kernel") {
+-    script = "build_kernel.sh"
+-    sources = [ kernel_source_dir ]
++  if (product_name == "arm64_virt") {
++    action("build_kernel") {
++      script = "build_kernel.sh"
++      sources = [ kernel_source_dir ]
+ 
+-    deps = [ ":check_build" ]
+-    product_path = "vendor/$product_company/$product_name"
+-    build_type = "standard"
+-    outputs = [ "$root_build_dir/packages/phone/images/$kernel_image" ]
+-    args = [
+-      rebase_path(kernel_build_script_dir, root_build_dir),
+-      rebase_path("$root_out_dir/../KERNEL_OBJ"),
+-      rebase_path("$root_build_dir/packages/phone/images"),
+-      build_type,
+-      target_cpu,
+-      product_path,
+-      device_name,
+-      linux_kernel_version,
+-    ]
++      deps = [ ":check_build" ]
++      product_path = "vendor/$product_company/$product_name"
++      build_type = "standard"
++      outputs = [ "$root_build_dir/packages/phone/images/$kernel_image" ]
++      args = [
++        rebase_path(kernel_build_script_dir, root_build_dir),
++        rebase_path("$root_out_dir/../KERNEL_OBJ"),
++        rebase_path("$root_build_dir/packages/phone/images"),
++        build_type,
++        "arm64",
++        product_path,
++        device_name,
++        linux_kernel_version,
++      ]
++    }
++  }
++  else {
++    action("build_kernel") {
++      script = "build_kernel.sh"
++      sources = [ kernel_source_dir ]
++
++      deps = [ ":check_build" ]
++      product_path = "vendor/$product_company/$product_name"
++      build_type = "standard"
++      outputs = [ "$root_build_dir/packages/phone/images/$kernel_image" ]
++      args = [
++        rebase_path(kernel_build_script_dir, root_build_dir),
++        rebase_path("$root_out_dir/../KERNEL_OBJ"),
++        rebase_path("$root_build_dir/packages/phone/images"),
++        build_type,
++        target_cpu,
++        product_path,
++        device_name,
++        linux_kernel_version,
++      ]
++    }
+   }
+ 
+   group("linux_kernel") {
+diff --git a/kernel.mk b/kernel.mk
+index 6544fab..e49c7d6 100644
+--- a/kernel.mk
++++ b/kernel.mk
+@@ -20,6 +20,7 @@ KERNEL_SRC_TMP_PATH := $(OUT_DIR)/kernel/${KERNEL_VERSION}
+ KERNEL_OBJ_TMP_PATH := $(OUT_DIR)/kernel/OBJ/${KERNEL_VERSION}
+ ifeq ($(BUILD_TYPE), standard)
+     BOOT_IMAGE_PATH = $(OHOS_BUILD_HOME)/device/board/hisilicon/hispark_taurus/uboot/prebuilts
++    LLVM_PATH = $(OHOS_BUILD_HOME)/prebuilts/clang/ohos/linux-x86_64/llvm/bin
+     KERNEL_SRC_TMP_PATH := $(OUT_DIR)/kernel/src_tmp/${KERNEL_VERSION}
+     export KERNEL_SRC_DIR=out/KERNEL_OBJ/kernel/src_tmp/${KERNEL_VERSION}
+ endif
+@@ -37,6 +38,7 @@ ifeq ($(KERNEL_ARCH), arm)
+     KERNEL_TARGET_TOOLCHAIN := $(PREBUILTS_GCC_DIR)/linux-x86/arm/gcc-linaro-7.5.0-arm-linux-gnueabi/bin
+     KERNEL_TARGET_TOOLCHAIN_PREFIX := $(KERNEL_TARGET_TOOLCHAIN)/arm-linux-gnueabi-
+ else ifeq ($(KERNEL_ARCH), arm64)
++    # KERNEL_TARGET_TOOLCHAIN := $(PREBUILTS_GCC_DIR)/linux-x86/aarch64/x64_aarch64-linux-gnu/bin
+     KERNEL_TARGET_TOOLCHAIN := $(PREBUILTS_GCC_DIR)/linux-x86/aarch64/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin
+     KERNEL_TARGET_TOOLCHAIN_PREFIX := $(KERNEL_TARGET_TOOLCHAIN)/aarch64-linux-gnu-
+ else ifeq ($(KERNEL_ARCH), x86_64)
+@@ -55,8 +57,11 @@ ifneq ($(KERNEL_ARCH), x86_64)
+ KERNEL_CROSS_COMPILE += CROSS_COMPILE="$(KERNEL_TARGET_TOOLCHAIN_PREFIX)"
+ endif
+ 
++KERNEL_CROSS_COMPILE += LLVM=1
++KERNEL_CROSS_COMPILE += LLVM_IAS=1
++
+ KERNEL_MAKE := \
+-    PATH="$(BOOT_IMAGE_PATH):$$PATH" \
++    PATH="$(BOOT_IMAGE_PATH):$(LLVM_PATH):$$PATH" \
+     $(KERNEL_PREBUILT_MAKE)
+ 
+ 
+@@ -84,7 +89,7 @@ endif
+ ifeq ($(PRODUCT_PATH), vendor/hisilicon/watchos)
+ 	$(hide) cd $(KERNEL_SRC_TMP_PATH) && patch -p1 < $(PRODUCT_PATCH_FILE)
+ else
+-	$(hide) cd $(KERNEL_SRC_TMP_PATH) && patch -p1 < $(DEVICE_PATCH_FILE)
++	$(hide) cd $(KERNEL_SRC_TMP_PATH) && test -f $(DEVICE_PATCH_FILE) && patch -p1 < $(DEVICE_PATCH_FILE) || true
+ endif 
+ 
+ ifneq ($(findstring $(BUILD_TYPE), small),)
+@@ -92,6 +97,7 @@ ifneq ($(findstring $(BUILD_TYPE), small),)
+ endif
+ 	$(hide) cp -rf $(KERNEL_CONFIG_PATH)/. $(KERNEL_SRC_TMP_PATH)/
+ 	$(hide) $(KERNEL_MAKE) -C $(KERNEL_SRC_TMP_PATH) ARCH=$(KERNEL_ARCH) $(KERNEL_CROSS_COMPILE) distclean
++	$(hide) echo "#### $(KERNEL_MAKE) -C $(KERNEL_SRC_TMP_PATH) ARCH=$(KERNEL_ARCH) $(KERNEL_CROSS_COMPILE) $(DEFCONFIG_FILE)..."
+ 	$(hide) $(KERNEL_MAKE) -C $(KERNEL_SRC_TMP_PATH) ARCH=$(KERNEL_ARCH) $(KERNEL_CROSS_COMPILE) $(DEFCONFIG_FILE)
+ ifeq ($(KERNEL_VERSION), linux-5.10)
+ 	$(hide) $(KERNEL_MAKE) -C $(KERNEL_SRC_TMP_PATH) ARCH=$(KERNEL_ARCH) $(KERNEL_CROSS_COMPILE) modules_prepare

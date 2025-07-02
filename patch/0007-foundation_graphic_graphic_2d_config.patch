@@ -1,0 +1,13 @@
+diff --git a/graphic_config.gni b/graphic_config.gni
+index f7b7b3bdb6..2b8f50ae7e 100644
+--- a/graphic_config.gni
++++ b/graphic_config.gni
+@@ -13,7 +13,7 @@
+ 
+ declare_args() {
+   graphic_2d_feature_bootanimation_enable = true
+-  graphic_2d_feature_ace_enable_gpu = true
++  graphic_2d_feature_ace_enable_gpu = false
+   graphic_2d_feature_color_gamut_enable = false
+   graphic_2d_feature_rs_enable_eglimage = false
+   graphic_2d_feature_rs_enable_uni_render = false

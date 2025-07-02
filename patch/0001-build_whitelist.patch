@@ -1,0 +1,77 @@
+diff --git a/compile_standard_whitelist.json b/compile_standard_whitelist.json
+index db4d2887..1e04a184 100644
+--- a/compile_standard_whitelist.json
++++ b/compile_standard_whitelist.json
+@@ -8,7 +8,10 @@
+         "third_party/pixman/bundle.json",
+         "third_party/wayland_standard/bundle.json",
+         "third_party/wpa_supplicant/wpa_supplicant-2.9_standard/bundle.json",
+-        "vendor/hihope/rk3568/ohos.build"
++        "vendor/hihope/rk3568/ohos.build",
++	"vendor/qemu/arm64_virt/ohos.build",
++	"device/board/qemu/arm64_virt/ohos.build",
++	"device/soc/qemu/arm64_virt/ohos.build"
+     ],
+     "subsystem_components": [],
+     "gn_part_or_subsystem_error": [
+@@ -43,7 +46,12 @@
+         "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_client_updater",
+         "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_supplicant",
+         "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_updater",
+-        "//vendor/hihope/rk3568/bluetooth:libbt_vendor"
++        "//vendor/hihope/rk3568/bluetooth:libbt_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_composer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_gfx",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vdi_impl",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_composer_vdi_impl"
+     ],
+     "deps_added_external_part_module": [
+         "//arkcompiler/ets_runtime/ecmascript/compiler:ark_aot_compiler",
+@@ -357,7 +365,12 @@
+         "//third_party/vk-gl-cts/framework/platform/ohos/rosen_context:rosen_context",
+         "//third_party/vk-gl-cts/framework/platform:libdeqp_ohos_platform",
+         "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa",
+-        "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_updater"
++        "//third_party/wpa_supplicant/wpa_supplicant-2.9_standard:wpa_updater",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_composer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_gfx",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vdi_impl",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_composer_vdi_impl"
+     ],
+     "external_deps_added_self_part_module": [
+         "//build/rust/tests/test_bin_crate:test_bin_crate",
+@@ -481,7 +494,13 @@
+         "//third_party/flutter/build:flutter_engine_fml_ohos",
+         "//third_party/libfuse:libfuse",
+         "//third_party/vk-gl-cts/framework/platform:libdeqp_ohos_platform",
+-        "//vendor/hihope/rk3568/bluetooth:libbt_vendor"
++        "//vendor/hihope/rk3568/bluetooth:libbt_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_composer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_gfx",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vdi_impl",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_composer_vdi_impl",
++	"//device/soc/qemu/arm64_virt/hardware/display:libhigbm_vendor"
+     ],
+     "third_deps_bundle_not_add": [
+         "//base/global/i18n_lite/interfaces/kits/js/builtin:nativeapi_locale_simulator",
+@@ -775,6 +794,16 @@
+         "//third_party/vk-gl-cts/modules/glshared:deqp-gl-shared_source",
+         "//third_party/vk-gl-cts/modules/glshared:libdeqp-gl-shared",
+         "//third_party/vulkan-loader/openharmony:vulkan_loader",
+-        "//third_party/rust/crates/rust-openssl/openssl-sys:lib"
++        "//third_party/rust/crates/rust-openssl/openssl-sys:lib",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_composer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:display_gfx",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vdi_impl",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_buffer_vendor",
++	"//device/soc/qemu/arm64_virt/hardware/display:libdisplay_composer_vdi_impl",
++	"//device/soc/qemu/arm64_virt/hardware/display:libhigbm_vendor",
++	"//third_party/libdrm/tests/modetest:modetest",
++	"//foundation/graphic/graphic_2d/rosen/samples/composer:hello_composer",
++	"//third_party/libdrm/tests/util:util",
++	"//third_party/libdrm:libdrm"
+     ]
+ }

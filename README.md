@@ -1,0 +1,2 @@
+# 说明
+此仓库作为本人基于OpenHarmony-4.0-Release版本移植arm64的qemu环境的仓库，基于此仓库能够实现OpenHarmony的虚拟机启动

@@ -1,0 +1,24 @@
+diff --git a/inherit/rich.json b/inherit/rich.json
+index 255af7f..0e52f2d 100644
+--- a/inherit/rich.json
++++ b/inherit/rich.json
+@@ -501,7 +501,7 @@
+         {
+           "component": "graphic_2d",
+           "features": [
+-            "graphic_2d_feature_ace_enable_gpu = true"
++            "graphic_2d_feature_ace_enable_gpu = false"
+           ]
+         },
+         {
+@@ -533,10 +533,6 @@
+         {
+           "component": "face_auth",
+           "features": []
+-        },
+-        {
+-          "component": "fingerprint_auth",
+-          "features": []
+         }
+       ]
+     },
