@@ -1,0 +1,26 @@
+#!/bin/bash
+qemu-system-aarch64 \
+-M virt \
+-cpu cortex-a53 \
+-smp 4 \
+-m 8192 \
+-nographic \
+-drive if=none,file=./chip_prod.img,format=raw,id=ohtest,index=4 \
+-device virtio-blk-device,drive=ohtest \
+-drive if=none,file=./userdata.img,format=raw,id=userdata,index=3 \
+-device virtio-blk-device,drive=userdata \
+-drive if=none,file=./vendor.img,format=raw,id=vendor,index=2 \
+-device virtio-blk-device,drive=vendor \
+-drive if=none,file=./system.img,format=raw,id=system,index=1 \
+-device virtio-blk-device,drive=system \
+-drive if=none,file=./updater.img,format=raw,id=updater,index=0 \
+-device virtio-blk-device,drive=updater \
+-kernel ./Image \
+-initrd ./ramdisk.img \
+-vnc :20 \
+-k en-us \
+-net nic \
+-net user,hostfwd=tcp::6666-:6666 \
+-device virtio-gpu-pci,xres=486,yres=864 \
+-display sdl,gl=on \
+-append "loglevel=7 ip=192.168.137.2:192.168.137.1:192.168.137.1:255.255.255.0::eth0:off LIBGL_ALWAYS_SOFTWARE=true LIBGL_DEBUG=verbose EGL_LOG_LEVEL=debug sn=0023456789 console=ttyAMA0,115200 init=/bin/init ohos.boot.hardware=arm64_virt default_boot_device=a003e00.virtio_mmio root=/dev/ram0 rw ohos.required_mount.system=/dev/block/vdb@/usr@ext4@ro,barrier=1@wait,required ohos.required_mount.vendor=/dev/block/vdc@/vendor@ext4@ro,barrier=1@wait,required ohos.required_mount.misc=/dev/block/vda@/misc@none@none=@wait,required ohos.required_mount.data=/dev/block/vdd@/data/@ext4@nosuid,nodev,noatime,barrier=1,data=ordered,noauto_da_alloc@wait,reservedsize=104857600 sn=0023456789"
